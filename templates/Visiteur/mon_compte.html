@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% include 'base/navbar_v.html' %}
+    <style>
+        body {
+            font-family: "Arial", sans-serif;
+            text-align: center;
+            margin-top: 100px;
+            background-color: #f5f5f5;
+        }
+
+        h1 {
+            color: #4CAF50;
+            font-size: 36px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        p {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        /* Bouton Supprimer mon compte */
+        .delete-button {
+            background-color: #ff5252;
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            font-size: 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            outline: none;
+        }
+
+        .delete-button:hover {
+            background-color: #ff1a1a;
+        }
+
+        /* Icone utilisateur */
+        .user-icon {
+            font-size: 72px;
+            color: #4CAF50;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Animation de survol */
+        .container:hover .user-icon {
+            transform: rotate(360deg);
+            transition: transform 1s ease;
+        }
+    </style>
+    <title>Mon Compte</title>
+</head>
+<body>
+    <div class="container">
+        <i class="bx bx-user-circle user-icon"></i>
+        <h1>Informations du compte</h1>
+        <p><strong>Nom Complet:</strong> {{ user.get_full_name }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Nombre de messages de réservation envoyés:</strong> {{ reservation_count }}</p>
+        <form action="{% url 'delete_account' %}" method="post">
+            {% csrf_token %}
+            <input type="submit" class="delete-button" value="Supprimer mon compte" onclick="return confirm('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.');">
+        </form>
+    </div>
+</body>
+</html>

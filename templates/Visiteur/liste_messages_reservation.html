@@ -1,0 +1,161 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<head>
+    <title>Liste des messages de réservation</title>
+    <style>
+        body {
+            font-family: "Arial", sans-serif;
+            margin: 0;
+            padding: 0;
+            margin-top: 50px;
+            background-color: #f2f2f2;
+            overflow-y: auto;
+        }
+
+        /* Personnalisation de la barre de défilement */
+        body::-webkit-scrollbar {
+            width: 10px;
+
+        }
+
+        body::-webkit-scrollbar-thumb {
+            background-color: #888;
+            border-radius: 5px;
+        }
+
+        body::-webkit-scrollbar-thumb:hover {
+            background-color: #555;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: nowrap;
+            margin-top: 50px;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+        }
+
+        .message-card {
+            flex: 0 0 auto;
+            width: 400px;
+            margin: 0 50px 0 200px;
+            background-color: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
+            animation: fadeInRight 0.5s ease-in-out;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+
+        .message-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes fadeInRight {
+            0% {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .message-details {
+            padding: 20px;
+        }
+
+        strong {
+            font-weight: bold;
+        }
+
+        pre {
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+
+        .delete-button {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center; }
+
+        .delete-icon {
+            font-size: 16px;
+            margin-right: 5px;
+        }
+        .icon {
+            font-size: 18px;
+            margin-right: 5px;
+        }
+
+    </style>
+</head>
+<body>
+    <center><h2><span class="icon">&#128221;</span>Liste des messages de réservation</center></h2>
+    <div class="container">
+        {% for message in messages_reservation %}
+            <div class="message-card">
+                <div class="message-details">
+                    <h3>Nom: {{ message.nom }}</h3>
+                    <p><span class="icon">&#128231;</span> <strong>Email:</strong> {{ message.email }}</p>
+                    <p><span class="icon">&#128197;</span> <strong>Date de réservation:</strong> {{ message.date_reservation }}</p>
+                    <pre>{{ message.message }}</pre>
+                </div>
+                <form action="{% url 'supprimer_message_reservation' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="message_id" value="{{ message.id }}">
+                    <button class="delete-button" type="submit" data-message-id="{{ message.id }}">
+                        <span class="delete-icon">&#128465;</span> Supprimer
+                    </button>
+            </div>
+        {% empty %}
+            <p>Aucun message de réservation pour le moment.</p>
+        {% endfor %}
+    </div>
+    <script>
+        const deleteButtons = document.querySelectorAll('.delete-button');
+    
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const messageId = button.getAttribute('data-message-id');
+                if (confirm('Êtes-vous sûr de vouloir supprimer ce message ?')) {
+                    supprimerMessage(messageId);
+                }
+            });
+        });
+    
+        function supprimerMessage(messageId) {
+            fetch('{% url "supprimer_message_reservation" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: `message_id=${messageId}`,
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Rafraîchir la page ou effectuer toute autre action
+                    location.reload();
+                } else {
+                    alert('Une erreur s\'est produite lors de la suppression du message.');
+                }
+            })
+            .catch(error => {
+                console.error('Erreur de suppression:', error);
+            });
+        }
+    </script>
+    
+</body>
+{% endblock %}

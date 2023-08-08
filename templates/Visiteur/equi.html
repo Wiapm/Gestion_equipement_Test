@@ -1,0 +1,182 @@
+<!-- Inclure les liens vers les fichiers CSS de Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+{% include 'base/navbar_v.html' %}
+<!-- Filtre par catégorie -->
+<div class="container">
+    <label for="categorie">Filtrer par catégorie :</label>
+    <select id="categorie">
+        <option value="">Toutes</option>
+        <option value="Chimie">Chimie</option>
+        <option value="Biologie">Biologie</option>
+        <option value="Microbiologie">Microbiologie</option>
+        <option value="Biotechnologie">Biotechnologie</option>
+        <option value="Autre">Autre</option>
+    </select>
+</div>
+<div class="container">
+    <label for="marque">Filtrer par marque :</label>
+    <select id="marque">
+        <option value="">Toutes</option>
+        {% for marque in marques_distinctes %}
+            <option value="{{ marque }}">{{ marque }}</option>
+        {% endfor %}
+    </select>
+    
+</div>
+
+
+<!-- Tableau des équipements -->
+<div class="container">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Référence</th>
+                <th>État</th>
+                <th>Date d'acquisition</th>
+                <th>Marque</th>
+                <th>Catégorie</th>
+                <th>Laboratoire</th>
+                <th>Etablissement</th>
+                <th>Réservation</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for equipement in equipements %}
+            <tr data-categorie="{{ equipement.Categorie }}" data-marque="{{ equipement.Marque }}">
+                <td>{{ equipement.Reference }}</td>
+                <td>
+                    {% if equipement.Etat == 'en panne' %}
+                        <span class="badge en-panne"><i class="fas fa-exclamation-circle"></i> En panne</span>
+                    {% elif equipement.Etat == 'Fonctionnel' %}
+                        <span class="badge fonctionnel"><i class="fas fa-check-circle"></i> Fonctionnel</span>
+                    {% elif equipement.Etat == 'Installé' %}
+                        <span class="badge installe"><i class="fas fa-cogs"></i> Installé</span>
+                    {% endif %}
+                </td>
+                <td>{{ equipement.Date_Acquisition }}</td>
+                <td>{{ equipement.Marque }}</td>
+                <td>{{ equipement.Categorie }}</td>
+                <td>{{ equipement.Laboratoire }}</td>
+                <td>{{ equipement.Laboratoire.Etablissement}}</td>
+                <td>
+                    <a href="{% url 'contact_laboratoire' equipement.id %}" class="btn btn-primary">Réserver</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Inclure les liens vers les fichiers JavaScript de Font Awesome -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+
+<script>
+    // Fonction pour filtrer les équipements en fonction de la catégorie et de la marque sélectionnées
+    function filtrerEquipements() {
+        const selectCategorie = document.getElementById('categorie');
+        const selectedCategorie = selectCategorie.value;
+
+        const selectMarque = document.getElementById('marque');
+        const selectedMarque = selectMarque.value;
+
+        const equipements = document.querySelectorAll('tr[data-categorie][data-marque]');
+
+        equipements.forEach((equipement) => {
+            const categorie = equipement.getAttribute('data-categorie');
+            const marque = equipement.getAttribute('data-marque');
+
+            const categorieMatch = selectedCategorie === '' || categorie === selectedCategorie;
+            const marqueMatch = selectedMarque === '' || marque === selectedMarque;
+
+            if (categorieMatch && marqueMatch) {
+                equipement.style.display = 'table-row';
+            } else {
+                equipement.style.display = 'none';
+            }
+        });
+    }
+
+    const selectCategorie = document.getElementById('categorie');
+    selectCategorie.addEventListener('change', filtrerEquipements);
+
+    const selectMarque = document.getElementById('marque');
+    selectMarque.addEventListener('change', filtrerEquipements);
+</script>
+
+<style>
+    body {
+        background-color: #ffffff; 
+        font-family: Arial, sans-serif;
+        margin-top: 100px;
+    }
+
+    table {
+        margin: 20px auto;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    .container {
+        margin: 20px 300px; 
+    }
+
+    th,
+    td {
+        border: 2px solid #000000;
+        padding: 10px;
+        text-align: center;
+        background-color: #fff;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+    tr:nth-child(even) td {
+        background-color: #f9f9f9;
+    }
+
+    .badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-weight: bold;
+    }
+
+    .en-panne {
+        color: red;
+        background-color: #fde6e6;
+    }
+
+    .fonctionnel {
+        color: green;
+        background-color: #e3fcec;
+    }
+
+    .installe {
+        color: blue;
+        background-color: #e4f4fd;
+    }
+
+    .btn {
+        margin-top: 20px;
+        display: inline-block;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        background-color: #007BFF;
+        color: #fff;
+        font-size: 14px;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn:hover {
+        background-color: #0056b3;
+    }
+
+    .active-filter {
+        background-color: #007BFF;
+        color: #fff;
+    }
+</style>

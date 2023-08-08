@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% include 'base/navbar_v.html' %}
+  <style>
+           .equipements-page {
+            font-family: "Arial", sans-serif;
+            text-align: center;
+            margin-top: 100px;
+        }
+
+        .equipements-page ul {
+            margin-top: 20px;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .equipements-page li {
+            margin: 10px;
+            padding: 15px;
+            
+        }
+
+  
+        .equipements-page a {
+            display: inline-block;
+            margin-top: 10px;
+           
+            color: white;
+            padding: 8px 12px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        
+
+        .equipements-page p {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="equipements-page">
+        <ul id="equipementsList">
+            {% if equipements %}
+                {% for equipement in equipements %}
+                    <li style="border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #f5f5f5;
+            width: 400px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+                        <strong>Reference:</strong> {{ equipement.Reference }}<br>
+                        <strong>Etat:</strong> {{ equipement.get_Etat_display }}<br>
+                        <strong>Date d'Acquisition:</strong> {{ equipement.Date_Acquisition }}<br>
+                        <strong>Marque:</strong> {{ equipement.Marque }}<br>
+                        <strong>Laboratoire:</strong> {{ equipement.Laboratoire }}<br>
+                        <strong>Ville de Laboratoire:</strong> {{ equipement.Laboratoire.Localisation}}<br>
+                        <a href="{% url 'contact_laboratoire' equipement.id %}" style=" background-color: #4CAF50;">Réserver cet équipement</a>
+                    </li>
+                {% endfor %}
+            {% else %}
+                <p>Aucun résultat trouvé pour la recherche.</p>
+            {% endif %}
+        </ul>
+    </div>
+</body>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+    <script>
+        $(document).ready(function() {
+            $('#navbarSearchForm').on('submit', function(event) {
+                event.preventDefault(); 
+
+                var searchTerm = $('.search-input').val(); 
+                $.ajax({
+                    type: 'GET',
+                    url: '{% url "search_equipments2" %}',
+                    data: {
+                        'Marque': searchTerm
+                    },
+                    success: function(data) {
+                        $('#equipementsList').html(data);
+                    },
+                    error: function(error) {
+                        console.log(error);
+                    }
+                });
+            });
+        });
+    </script>
+
+</html>
