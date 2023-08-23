@@ -11,6 +11,9 @@ import time
 
 
 
+
+
+
 options = webdriver.ChromeOptions()
 options.add_argument("--headless")  # Run Chrome in headless mode
 options.add_argument("--no-sandbox")  # Required when running as root user
